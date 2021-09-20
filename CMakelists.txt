@@ -1,0 +1,10 @@
+#pragma once
+project(peresdacha)
+
+
+
+set(VECTOR_SRC main.cpp pic.bpm )
+set(VECTOR_HDR main.h)
+
+
+add_executable(${PROJECT_NAME} ${VECTOR_SRC} ${VECTOR_HDR})
