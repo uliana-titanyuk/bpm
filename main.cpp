@@ -16,27 +16,29 @@ int main()
 	pic.pixels = new unsigned char[pic.size];
 	fread(pic.pixels, sizeof(unsigned char), pic.size, f);
 	fclose(f);
-	for (int i = 0; i < pic.size; i += 3) {
-		unsigned char tpm = pic.pixels[i];
-		pic.pixels[i] = pic.pixels[i + 2];
-		pic.pixels[i + 2]=tpm;
-	}
 	bmp newpic;
+	newpic.header[18]= pic.Yy;
+	newpic.header[22] = pic.Xx;
 	newpic.Xx = pic.Yy;
 	newpic.Yy = pic.Xx;
 	newpic.size = pic.size;
-	for (int x = 0; x < newpic.Xx;x++) {
-		for (int y = 0; y < newpic.Yy;y ++) {
-			newpic.pixels[x * newpic.Xx + y] = pic.pixels[y * newpic.Xx + x];
+	newpic.pixels = new unsigned char[pic.size];
+	FILE* out = fopen("pic2.bpm", "wb");
+	for (int x = 0; x < newpic.Xx; x++) {
+		for (int y = 0; y < newpic.Yy; y++) {
+			size_t new_index = newpic.Xx * x + y;
+			size_t old_index = pic.Xx * y + x;
+			newpic.pixels[new_index] = pic.pixels[old_index];
+			newpic.pixels[new_index+1] = pic.pixels[old_index+1];
+			newpic.pixels[new_index+2] = pic.pixels[old_index+2];
 		}
 	}
-	FILE* out = fopen("pic2.bpm", "wb");
-	fclose(out);
 	fwrite(newpic.header, sizeof(unsigned char), 54, out);
-		for (int i = 0; i < pic.size; i += 3) {
-			unsigned char tpm = pic.pixels[i];
-			pic.pixels[i] = pic.pixels[i + 2];
-			pic.pixels[i + 2] = tpm;
-		}
-		return 0;
+	for (int i = 0; i < newpic.size; i +=3) {
+	fwrite(&(newpic.pixels[i]), sizeof(unsigned char),3 ,out);
+}
+	delete[] pic.pixels;
+	delete[] newpic.pixels;
+	fclose(out);
+	return 0;
 }
